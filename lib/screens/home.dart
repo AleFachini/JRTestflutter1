@@ -57,12 +57,15 @@ class DetailedView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Detalles'),
+      ),
       body: Container(
         color: Colors.purple[100],
         child: Column(
           children: [
             SizedBox(
-              height: 25,
+              height: 16,
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.start,

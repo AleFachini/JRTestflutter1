@@ -42,7 +42,11 @@ class HomeController extends GetxController {
     }
     Uint8List body = response.bodyBytes;
     //Map<String, String> header = response.headers;//debug
-    return Image.memory(body);
+    return Image.memory(
+      body,
+      height: 400,
+      width: 400,
+    );
   }
 
   void setCurrentEntry(Entry entry) {
