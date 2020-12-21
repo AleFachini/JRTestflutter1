@@ -12,8 +12,10 @@ class HomeController extends GetxController {
   Future<List<Entry>> futureResponse;
   //all entries
   final List<Entry> listEntries = new List<Entry>();
-  //Obs for making the Listview
+  //Obs for making the Listview, redibuja el listview?
   final listView = List<Entry>().obs;
+  //Current Details URL
+  String currentUrl = '';
 
   Future<List<Entry>> fetchEntries() async {
     final response = await http.get('https://picsum.photos/v2/list');
@@ -26,22 +28,30 @@ class HomeController extends GetxController {
         entriesList.map((entriesList) => Entry.fromJson(entriesList)).toList();
     print('${entries.length}');
     print('${entries[3].id}');
+    listEntries.clear();
     listEntries.addAll(entries);
     return listEntries;
   }
 
   //String redirectUrl(String url)
   Future<Image> redirectUrl(String url) async {
-    Image _image;
     final response = await http.get(url);
 
     if (response.statusCode != 200) {
       throw (response.headers);
     }
-    String body = response.body;
-    Uint8List body2 = response.bodyBytes;
-    Map<String, String> header = response.headers;
-    return Image.memory(body2);
+    Uint8List body = response.bodyBytes;
+    //Map<String, String> header = response.headers;//debug
+    return Image.memory(body);
+  }
+
+  void setCurrentEntry(Entry entry) {
+    this.entry.value = entry;
+    return;
+  }
+
+  Entry getCurrentEntry() {
+    return this.entry.value;
   }
 
   void loadMore() {
@@ -53,6 +63,7 @@ class HomeController extends GetxController {
     // TODO: implement onInit
     super.onInit();
     print('Init HomeController');
+    //fetch JSON when i start controller
     futureResponse = fetchEntries();
   }
 }

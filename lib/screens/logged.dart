@@ -29,7 +29,7 @@ class Logged extends GetView<AuthController> {
         builder: (drawerController) {
           print('${drawerController.state.value}');
           if (drawerController.state.value == DrawerStatus.home) {
-            homeController.fetchEntries();
+            //homeController.fetchEntries();//fetch JSON everytime i click
             return Home();
           }
           if (drawerController.state.value == DrawerStatus.logged) {
