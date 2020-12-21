@@ -42,7 +42,7 @@ class AuthController extends GetxController {
   }
 
   void logout() {
-    //box.erase();
+    box.write('status', false);
     Get.off(Login());
     return;
   }

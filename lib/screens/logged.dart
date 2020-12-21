@@ -1,6 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:urbetrack_101/controllers/drawercontroller.dart';
+import 'package:urbetrack_101/controllers/homecontroller.dart';
 import '../controllers/authentication.dart';
 
 import '../mydrawer.dart';
@@ -12,6 +14,8 @@ class Logged extends GetView<AuthController> {
   final AuthController controller = Get.find<AuthController>();
   //Este se importa individualmente
   final ControllerForDrawer drawerController = Get.put(ControllerForDrawer());
+  //Controller for JSON serialization and Listview
+  final HomeController homeController = Get.put(HomeController());
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,8 +28,11 @@ class Logged extends GetView<AuthController> {
         init: ControllerForDrawer(),
         builder: (drawerController) {
           print('${drawerController.state.value}');
-          if (drawerController.state.value == DrawerStatus.home) return Home();
-          if (drawerController.state.value == DrawerStatus.logged)
+          if (drawerController.state.value == DrawerStatus.home) {
+            homeController.fetchEntries();
+            return Home();
+          }
+          if (drawerController.state.value == DrawerStatus.logged) {
             return Container(
               color: Colors.purple[100],
               child: Column(
@@ -36,11 +43,15 @@ class Logged extends GetView<AuthController> {
                 ],
               ),
             );
+          }
           return CircularProgressIndicator();
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => Get.off(Login()),
+        onPressed: () {
+          controller.logout();
+          drawerController.goToState(DrawerStatus.logged);
+        },
         tooltip: 'Logout',
         child: const Icon(Icons.keyboard_backspace),
       ),
