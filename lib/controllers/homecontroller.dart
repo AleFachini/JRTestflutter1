@@ -13,7 +13,8 @@ class HomeController extends GetxController {
   //all entries
   final List<Entry> listEntries = new List<Entry>();
   //Obs for making the Listview, redibuja el listview?
-  final listView = List<Entry>().obs;
+  final RxList<Entry> listView = <Entry>[].obs;
+
   //Current Details URL
   String currentUrl = '';
 
@@ -30,11 +31,12 @@ class HomeController extends GetxController {
     print('${entries[3].id}');
     listEntries.clear();
     listEntries.addAll(entries);
+    getPartialEntries();
     return listEntries;
   }
 
   //String redirectUrl(String url)
-  Future<Image> redirectUrl(String url) async {
+  Future<Image> redirectUrl(String url, double height, double width) async {
     final response = await http.get(url);
 
     if (response.statusCode != 200) {
@@ -44,9 +46,23 @@ class HomeController extends GetxController {
     //Map<String, String> header = response.headers;//debug
     return Image.memory(
       body,
-      height: 400,
-      width: 400,
+      height: height, //300
+      width: width, //400
     );
+  }
+
+  void getPartialEntries() {
+    //start index inclusive, end index exclusive
+    this.listView.assignAll(listEntries.sublist(0, 5));
+    return;
+  }
+
+  void addMoreEntries() {
+    int actualLength = this.listView.length;
+    if (actualLength < 30) {
+      this.listView.assignAll(listEntries.sublist(0, actualLength + 5));
+    }
+    return;
   }
 
   void setCurrentEntry(Entry entry) {
@@ -56,10 +72,6 @@ class HomeController extends GetxController {
 
   Entry getCurrentEntry() {
     return this.entry.value;
-  }
-
-  void loadMore() {
-    return;
   }
 
   @override

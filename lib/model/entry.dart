@@ -11,10 +11,18 @@ part 'entry.g.dart';
 class Entry {
   final String id;
   final String author;
+  final int width;
+  final int height;
   final String url;
   final String download_url;
 
-  Entry({this.id, this.author, this.url, this.download_url});
+  Entry(
+      {this.id,
+      this.author,
+      this.width,
+      this.height,
+      this.url,
+      this.download_url});
   factory Entry.fromJson(Map<String, dynamic> json) => _$EntryFromJson(json);
   Map<String, dynamic> toJson() => _$EntryToJson(this);
 }

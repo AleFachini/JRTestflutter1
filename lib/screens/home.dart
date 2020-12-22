@@ -9,42 +9,77 @@ final HomeController controller = Get.find<HomeController>();
 class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-        padding: const EdgeInsets.all(8),
-        itemCount: controller.listEntries.length,
-        itemBuilder: (BuildContext context, int index) {
-          return Container(
-            height: 50,
-            color: Colors.amber[50],
-            child: GestureDetector(
-              onTap: () {
-                //Setting details url
-                controller.setCurrentEntry(controller.listEntries[index]);
-                print('ID: ${controller.listEntries[index].id}');
-                Get.to(DetailedView());
-              },
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Center(
-                    child: Text(
-                      'Author: ${controller.listEntries[index].author}',
-                      textAlign: TextAlign.start,
-                      style: TextStyle(
-                        color: Colors.blue,
-                        fontFamily: "Roboto",
-                        fontStyle: FontStyle.italic,
+    return GestureDetector(
+      onVerticalDragDown: (DragDownDetails dragDownDetails) {
+        print('gesture detected ${controller.listView.length}');
+        controller.addMoreEntries();
+      },
+      child: Obx(() {
+        return ListView.builder(
+            padding: const EdgeInsets.all(8),
+            itemCount: controller.listView.length,
+            itemBuilder: (BuildContext context, int index) {
+              controller.setCurrentEntry(controller.listView[index]);
+              return InkWell(
+                onTap: () {
+                  //Setting details url
+                  controller.setCurrentEntry(controller.listView[index]);
+                  print('ID: ${controller.listView[index].id}');
+                  Get.to(DetailedView());
+                },
+                child: Container(
+                  color: Colors.pink[50],
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Center(
+                            child: Text(
+                              'Author: ${controller.listView[index].author}',
+                              textAlign: TextAlign.start,
+                              style: TextStyle(
+                                color: Colors.blue,
+                                fontFamily: "Roboto",
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          ),
+                          Center(
+                            child: Text('Nº ${index + 1}: Tap for Details.'),
+                          ),
+                        ],
                       ),
-                    ),
+                      Center(
+                        child: FutureBuilder(
+                          future: controller.redirectUrl(
+                              controller.getCurrentEntry().download_url,
+                              150,
+                              150), //it's not reactive it wont use .value
+                          initialData: null,
+                          builder:
+                              (BuildContext context, AsyncSnapshot snapshot) {
+                            if (snapshot.hasData) {
+                              if (snapshot.data != null) {
+                                return snapshot.data;
+                              }
+                            }
+                            return Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          },
+                        ), //ImageFutureBuilder
+                      ),
+                      Divider(
+                        color: Colors.blue,
+                      ),
+                    ],
                   ),
-                  Center(
-                    child: Text('Tap for Details.'),
-                  ),
-                ],
-              ),
-            ),
-          );
-        });
+                ),
+              );
+            });
+      }),
+    );
   }
 }
 
@@ -64,9 +99,6 @@ class DetailedView extends StatelessWidget {
         color: Colors.purple[100],
         child: Column(
           children: [
-            SizedBox(
-              height: 16,
-            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
@@ -106,6 +138,36 @@ class DetailedView extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
+                      'Width: ${controller.getCurrentEntry().width}',
+                      textAlign: TextAlign.start,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Flexible(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      'Height: ${controller.getCurrentEntry().height}',
+                      textAlign: TextAlign.start,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Flexible(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
                       'Url: ${controller.getCurrentEntry().url}',
                       textAlign: TextAlign.start,
                       overflow: TextOverflow.ellipsis,
@@ -131,9 +193,10 @@ class DetailedView extends StatelessWidget {
             ),
             Center(
               child: FutureBuilder(
-                future: controller.redirectUrl(controller
-                    .getCurrentEntry()
-                    .download_url), //it's not reactive it wont use .value
+                future: controller.redirectUrl(
+                    controller.getCurrentEntry().download_url,
+                    300,
+                    400), //it's not reactive it wont use .value
                 initialData: null,
                 builder: (BuildContext context, AsyncSnapshot snapshot) {
                   if (snapshot.hasData) {
